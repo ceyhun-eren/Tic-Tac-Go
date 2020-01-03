@@ -9,6 +9,6 @@ I started this project about a month ago. The reason I started the project is be
 
 # contactMe
 LinkedIn	:: https://www.linkedin.com/in/ceyhun-eren-402000195/
-g-Mail		:: erenceyhun85@gmail.com
+/n g-Mail		:: erenceyhun85@gmail.com
 Discord		:: https://discord.gg/AUj4rPu
 playStore	:: https://play.google.com/store/apps/developer?id=ZinnZ+Game+Studio
