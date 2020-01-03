@@ -1,2 +1,2 @@
-# Tic-Tac-Go
+# Tic-Tac-Go!
 My sample game type of HyperCasual.
