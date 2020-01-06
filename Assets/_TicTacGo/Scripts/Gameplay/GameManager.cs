@@ -105,7 +105,10 @@ public class GameManager : MonoBehaviour
             GameObject go = Instantiate(Bullet, playerClock.BulletPosition(), Quaternion.identity);
             go.GetComponent<Rigidbody2D>().velocity = playerClock.ShootDirection() * bulletSpeed;
 
+            playerClock.MakePlayer();
+
             ObjectPool.Initializing.AddPool(playerClock.gameObject);
+
             //Eksik yer
 
             playerClock = null;

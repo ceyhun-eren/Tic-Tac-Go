@@ -59,22 +59,27 @@ public class ClockController : MonoBehaviour
     /// <summary>
     /// This function make player this
     /// </summary>
-    void MakePlayer()
+    public void MakePlayer()
     {
-        isPlayer = true;
-
         var spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.color = Color.black;
 
-        Arrow.SetActive(true);
-        Circle.SetActive(true);
-        Clockwise.SetActive(false);
+        if (isPlayer)
+        {
+            spriteRenderer.color = Color.black;
 
-        var gManager = GameManager.Initializing;
-        gManager.playerClock = this;
-        gManager.iCanShoot = true;
-        
-        gManager.SendNewClock();
+            var gManager = GameManager.Initializing;
+            gManager.playerClock = this;
+            gManager.iCanShoot = true;
+            gManager.SendNewClock();
+        }
+        else
+        {
+            spriteRenderer.color = Color.white;
+        }
+
+        Arrow.SetActive(isPlayer);
+        Circle.SetActive(isPlayer);
+        Clockwise.SetActive(!isPlayer);
 
         Debug.Log("NewPlayer is Me");
     }
@@ -102,6 +107,8 @@ public class ClockController : MonoBehaviour
         if (collision.CompareTag("Bullet") && !isPlayer)
         {
             Destroy(collision.gameObject);
+            
+            isPlayer = true;
 
             MakePlayer();
         }
