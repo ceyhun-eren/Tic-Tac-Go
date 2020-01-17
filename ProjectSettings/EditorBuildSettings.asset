@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/_TicTacGo/Scenes/GameScene.unity
+    guid: ad4d125499a19d84e831602f1e0a4785
   m_configObjects: {}

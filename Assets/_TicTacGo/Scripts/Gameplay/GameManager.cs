@@ -6,7 +6,17 @@ public enum GameMode
     Carrier,
     Endless,
 }
-    
+
+public enum GameState
+{
+    Prepare,
+    Playing,
+    Paused,
+    LevelCompleted,
+    PreGameOver,
+    GameOver
+}
+
 public enum DifficultyLevel
 {
     non,
@@ -15,82 +25,80 @@ public enum DifficultyLevel
     Advanced,
 }
 
-[RequireComponent(typeof(ObjectGrid))]
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
+    //// (Optional) Prevent non-singleton constructor use.
+    protected GameManager() { }
 
     [SerializeField] public int targetFrameRate = 60; // Application target frame per second.
+    public bool VSYNC = true;
 
+    public static event System.Action<GameState, GameState> GameStateChanged = delegate { };
     public GameMode gameMode { get; set; }
+    private GameState _gameState = GameState.Prepare;
+    public GameState GameState
+    {
+        get
+        {
+            return _gameState;
+        }
+        private set
+        {
+            if (value != _gameState)
+            {
+                GameState oldState = _gameState;
+                _gameState = value;
+
+                GameStateChanged(_gameState, oldState);
+                
+                if(value == GameState.GameOver)
+                {
+                    GameEnd();
+                }
+            }
+        }
+    }
+
+
     public ClockController playerClock { get; set; }
 
     // Prefabs
-    public GameObject Bullet;
-    //public GameObject Clock;
+    [SerializeField] public GameObject Bullet;
+    [SerializeField] public GameObject Clock;
 
     // My Props
     public int bulletSpeed { get ; private set; }
     public int highScore { get; set; }
     public bool  iCanShoot { get; set; }
 
-    private Color Background;
-    public Color _Background 
+    private Color _background;
+    public Color Background
     {
         get
         {
-            return Background;
+            return _background;
         }
         private set
         {
-            Background = value;
+            _background = value;
             Camera.main.backgroundColor = Background;
         }
     }
 
-    // Singleton
-    private static GameManager _instance;
-    public static GameManager Initializing
-    {
-        get
-        {
-            if (!_instance)
-            {
-                GameObject gManager = new GameObject("GameManager");
-                gManager.AddComponent<GameManager>();
-            }
-            return _instance;
-        }
-    }
     private void Awake()
     {
         // Set bullet speed
         bulletSpeed = 10;
 
         // Set background color to Random Color.
-        _Background = GetRandomColor();
+        Background = GetRandomColor();
 
         // VSYNC is enabled.
-        Application.targetFrameRate = targetFrameRate;
+        if (VSYNC)
+        {
+            Application.targetFrameRate = targetFrameRate;
+        }
 
-        // Set _Instance to this
-        if(!_instance)
-        {
-            _instance = this;
-            //DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Debug.Log("GameManager Destroying...");
-            Destroy(gameObject);
-        }
-    }
-
-    void Start()
-    {
-        for (int i = 0; i < 5; i++)
-        {
-            SendNewClock();
-        }
     }
 
     /// <summary>
@@ -105,11 +113,7 @@ public class GameManager : MonoBehaviour
             GameObject go = Instantiate(Bullet, playerClock.BulletPosition(), Quaternion.identity);
             go.GetComponent<Rigidbody2D>().velocity = playerClock.ShootDirection() * bulletSpeed;
 
-            playerClock.MakePlayer();
-
-            ObjectPool.Initializing.AddPool(playerClock.gameObject);
-
-            //Eksik yer
+            ObjectPool.Instance.AddPool(playerClock.gameObject);
 
             playerClock = null;
         }
@@ -117,16 +121,17 @@ public class GameManager : MonoBehaviour
 
     /// <summary>
     /// Spawn new clock on scene
+    /// Note: that function called when game mode equals to endless mode.
     /// </summary>
     public void SendNewClock()
     {
         // Get a Clock at ObjectPool
-        var newClock = ObjectPool.Initializing.GetAtPool();
+        var newClock = ObjectPool.Instance.GetAtPool();
 
         // Get a Empty at ObjectGrid
-        var clockPosition = ObjectGrid.Initializing.EmptyPoint();
+        var clockPosition = ObjectGrid.Instance.EmptyPoint();
 
-        // Apply on scene
+        // Apply to scene
         newClock.transform.position = new Vector3(clockPosition.x, clockPosition.y, 0);
 
         // Set grid id to new clock
@@ -146,4 +151,5 @@ public class GameManager : MonoBehaviour
         var randomColor = Random.ColorHSV(0, 1f, 0, 1f, 0, 1f);
         return randomColor;
     }
+    
 }

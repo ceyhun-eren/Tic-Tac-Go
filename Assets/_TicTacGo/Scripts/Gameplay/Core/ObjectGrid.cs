@@ -22,48 +22,26 @@ public class Grid
 
 }
 
-public class ObjectGrid : MonoBehaviour
+public class ObjectGrid : Singleton<ObjectGrid>
 {
     public List<Grid> emptyGrids = new List<Grid>();
     public List<Grid> fullGrids = new List<Grid>();
-    
-    [SerializeField] float x_Start, y_Start;
-    [SerializeField] float x_Space, y_Space;
-    [SerializeField] int columnLength, rowLength;
 
-    private static ObjectGrid _instance;
-    public static ObjectGrid Initializing
+    [HideInInspector, SerializeField] float x_Start = -2f;
+    [HideInInspector, SerializeField] float y_Start = 3.3f;
+    [HideInInspector, SerializeField] float x_Space = 1.01f;
+    [HideInInspector, SerializeField] float y_Space = 1.01f;
+    [HideInInspector, SerializeField] int columnLength = 5;
+    [HideInInspector, SerializeField] int rowLength = 7;
+
+    void Start()
     {
-        get
-        {
-            if (_instance == null)
-            {
-                GameObject oGrid = new GameObject("ObjectGrid");
-                oGrid.AddComponent<ObjectGrid>();
-            }
-            return _instance;
-        }
-
-    }
-
-    private void Awake()
-    {
-        if (!_instance)
-        {
-            _instance = this;
-        }
-        else
-        {
-            Debug.Log("Destroying other ObjectPools..");
-            Destroy(gameObject);
-        }
         CreateGrid();
     }
-
-    // Start is called before the first frame update
+   
+    // Create grids when is called
     private void CreateGrid()
     {
-        // There is i am doing create a grid system and i am working oop(object orident programming)
         for (int i = 0; i < columnLength * rowLength; i++)
         {
             var gridX = x_Start + (x_Space * (i % columnLength));

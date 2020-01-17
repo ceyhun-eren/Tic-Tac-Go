@@ -1,29 +1,40 @@
 ﻿using UnityEngine;
 
+public enum ClockType
+{
+    non,
+    Big,
+    Medium,
+    Small
+}
+
 public class ClockController : MonoBehaviour
 {
-    public bool isPlayer = false;
+    // Get Game Manager
+    private GameManager gameManager;
+    
+    
     public float gridId = 0;
-
+    public bool isPlayer = false;
+    private bool onChange = false;
+    
+    // for change of clock type
     public GameObject Circle;
     public GameObject Arrow;
-    public GameObject Clockwise;
+    public SpriteRenderer Clockwise;
+    public SpriteRenderer ClockBackground;
 
-    [Range(100f,500f)]
+    [Range(100f, 500f)]
     public float clockSpeed;
 
     private void Awake()
     {
+        gameManager = GameManager.Instance;
+
         // Set clock size ClockType.Big : ClockType.Medium : ClockType.Small
         SetClockSize();
 
-        // ClockWise's color equals to background color
-        var spriteClockwise = Clockwise.GetComponent<SpriteRenderer>();
-        spriteClockwise.color = GameManager.Initializing._Background;
-
-        // Set child is disabled.
-        Arrow.SetActive(false);
-        Circle.SetActive(false);
+        OnChangeClockType();
 
         // Get random value for clockSpeed
         clockSpeed = Random.Range(100f, 500f);
@@ -31,13 +42,18 @@ public class ClockController : MonoBehaviour
 
     private void Update()
     {
-        // Move Clockwise when is not player.
-        MoveClockwise();
+        
+        if(!onChange)
+        {
+            // Move Clockwise.
+            MoveClockwise();
+        }
+
     }
 
     void SetClockSize()
     {
-        float scale = Random.Range(0.5f, 0.72f);
+        float scale = Random.Range(0.45f, 0.72f);
         transform.localScale = new Vector3(scale, scale, scale);
     }
 
@@ -59,29 +75,16 @@ public class ClockController : MonoBehaviour
     /// <summary>
     /// This function make player this
     /// </summary>
-    public void MakePlayer()
+    public void RefreshStatus()
     {
-        var spriteRenderer = GetComponent<SpriteRenderer>();
+        OnChangeClockType();
 
-        if (isPlayer)
-        {
-            spriteRenderer.color = Color.black;
+        ClockBackground.color = Color.black;
 
-            var gManager = GameManager.Initializing;
-            gManager.playerClock = this;
-            gManager.iCanShoot = true;
-            gManager.SendNewClock();
-        }
-        else
-        {
-            spriteRenderer.color = Color.white;
-        }
+        gameManager.playerClock = this;
+        gameManager.iCanShoot = true;
 
-        Arrow.SetActive(isPlayer);
-        Circle.SetActive(isPlayer);
-        Clockwise.SetActive(!isPlayer);
-
-        Debug.Log("NewPlayer is Me");
+        gameManager.SendNewClock();
     }
 
     /// <summary>
@@ -102,16 +105,57 @@ public class ClockController : MonoBehaviour
         return (Arrow.transform.GetChild(0).transform.position - Arrow.transform.position).normalized;
     }
 
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Bullet") && !isPlayer)
         {
             Destroy(collision.gameObject);
-            
+
             isPlayer = true;
 
-            MakePlayer();
+            RefreshStatus();
         }
+    }
+
+    private void OnEnable()
+    {
+        GameManager.GameStateChanged += OnGameStateChanged;
+    }
+
+    /// <summary>
+    /// I will use that when adding to objects pool.
+    /// Note : Only endless mode.
+    /// </summary>
+    private void OnDisable()
+    {
+        OnChangeClockType();
+        GameManager.GameStateChanged -= OnGameStateChanged;
+
+        ClockBackground.color = Color.white;
+
+        /*Arrow.SetActive(isPlayer);
+        Circle.SetActive(isPlayer);
+        Clockwise.gameObject.SetActive(!isPlayer);*/
+    }
+
+    private void OnGameStateChanged(GameState newState, GameState oldState)
+    {
+        if(newState == GameState.Paused || newState == GameState.PreGameOver || newState == GameState.GameOver)
+        {
+            onChange = true;
+        }
+        else
+        {
+            onChange = false;
+        }
+    }
+
+    void OnChangeClockType()
+    {
+        Arrow.SetActive(!Arrow.activeSelf);
+        Circle.SetActive(!Circle.activeSelf);
+        Clockwise.gameObject.SetActive(!Clockwise.gameObject.activeSelf);
     }
 
 }

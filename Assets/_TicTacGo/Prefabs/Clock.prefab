@@ -201,11 +201,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e02dac08f7561da43b3753ad43fe237d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isPlayer: 0
   gridId: 0
+  isPlayer: 0
   Circle: {fileID: 6830867548100404249}
   Arrow: {fileID: 6830867547737946320}
-  Clockwise: {fileID: 6830867547251291241}
+  Clockwise: {fileID: 6830867547251291239}
+  ClockBackground: {fileID: 6830867547254991290}
   clockSpeed: 100
 --- !u!1 &6830867547737946320
 GameObject:
@@ -223,7 +224,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6830867547737946319
 Transform:
   m_ObjectHideFlags: 0
@@ -333,7 +334,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6830867548100404248
 Transform:
   m_ObjectHideFlags: 0

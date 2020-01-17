@@ -1,39 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPool : MonoBehaviour
+public class ObjectPool : Singleton<ObjectPool>
 {
     [SerializeField] private GameObject prefabsClock;
     public Stack<GameObject> objectPool = new Stack<GameObject>();
-
-    private static ObjectPool _instance;
-    public static ObjectPool Initializing 
-    {
-        get
-        {
-            if(_instance == null)
-            {
-                GameObject oPool = new GameObject("ObjectPool");
-                oPool.AddComponent<ObjectPool>();
-            }
-            return _instance;
-        }
-    
-    }
-
-    private void Awake()
-    {
-        if (!_instance)
-        {
-            _instance = this;
-        }
-        else
-        {
-            Debug.Log("Destroying other ObjectPools..");
-            Destroy(gameObject);
-        }
-
-    }
 
     /// <summary>
     /// Why i use start instead of awake method ?
@@ -54,7 +25,7 @@ public class ObjectPool : MonoBehaviour
             newClock.SetActive(true);
             return newClock;
         }
-        return Instantiate(prefabsClock);
+        return Instantiate(GetClock());
     }
 
     public void AddPool(GameObject newObject)
@@ -67,9 +38,18 @@ public class ObjectPool : MonoBehaviour
     {
         for (int i = 0; i < value; i++)
         {
-            GameObject insObject = Instantiate(prefabsClock);
+            GameObject insObject = Instantiate(GetClock());
             AddPool(insObject);
         }
+    }
+    
+    GameObject GetClock()
+    {
+        if (!prefabsClock)
+        {
+            prefabsClock = GameManager.Instance.Clock;
+        }
+        return prefabsClock;
     }
 
 }
